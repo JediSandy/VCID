@@ -1,0 +1,42 @@
+version: '3.9'
+services:
+  mysql:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: Passw0rd
+      MARIADB_DATABASE: microblog
+      MARIADB_USER: microblog
+      MARIADB_PASSWORD: Passw0rd
+    volumes:
+      - /home/ubuntu/pa/db/:/var/lib/mysql
+      - /home/ubuntu/pa/dbconfig/:/etc/mysql
+    expose:
+      - 3306
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - ADMINER_DEAULT_SERVER=mysqldb
+  flask:
+    build: .
+    image: flask
+    container_name: flask
+    depends_on:
+      - mysql
+    restart: always
+    ports:
+      - 80:5000
+    volumes:
+      - ./app:/app:ro
+    environment:
+      SECRET_KEY: kjlldmmk3us7oq0ldkj3794byf5a7jhs
+      DATABASE_URL: mysql+pymysql://microblog:Passw0rd@mysql/microblog
+networks:
+  network1:
+    name: flask-app
+
